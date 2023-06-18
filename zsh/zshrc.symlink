@@ -33,9 +33,15 @@ do
   source $file
 done
 
+# load oh-my-zsh configuration
+source $DOTFILES/zsh/oh-my-zshrc
+
+# uncomment below if we choose to not use oh-my-zshrc anymore
 # initialize autocomplete here, otherwise functions won't be loaded
-autoload -U compinit
-compinit
+# else
+	# autoload -U compinit
+	# compinit
+# fi
 
 # load every completion after autocomplete loads
 for file in ${(M)config_files:#*/completion.zsh}
