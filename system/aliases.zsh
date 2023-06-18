@@ -8,3 +8,10 @@ then
   alias ll="gls -l --color"
   alias la='gls -A --color'
 fi
+
+# linux pbcopy
+if ! $(command -v pbcopy &> /dev/null)
+then
+  alias pbcopy="xsel --clipboard --input"
+fi
+
