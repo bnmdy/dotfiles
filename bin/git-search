@@ -1,0 +1,9 @@
+#/bin/sh
+# usage : git search <regex> [opts]
+# see git log manual for a list of options
+# 
+# examples
+# --------
+# search for secrets in all branches : git search "AIza[0-9A-Za-z\\-_]{35}" --all
+
+git log -p -G "$@"
