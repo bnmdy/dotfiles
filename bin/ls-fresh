@@ -1,2 +1,5 @@
-#/bin/sh
+#!/bin/sh
+#
+# List recently modified files in the current directory.
+
 find . -maxdepth 4 -type d -exec stat --format '%y -> %n' {} \; | sort -k 1 -r
