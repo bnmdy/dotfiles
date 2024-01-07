@@ -1,0 +1,56 @@
+#!/bin/bash
+#
+# Generate keywords from a given query using Google Suggest API.
+
+declare -A seen
+
+function generate_keywords {
+    local query="$1"
+    local language="$2"
+    local region="$3"
+    local max_depth="$4"
+    local depth="$5"
+
+    for letter in {a..z}; do
+        local hinted_query="${query} ${letter}"
+        get_suggestions "$hinted_query" "$language" "$region" "$max_depth" "$depth"
+    done
+}
+
+function get_suggestions {
+    local query="$1"
+    local language="$2"
+    local region="$3"
+    local max_depth="$4"
+    local depth="$5"
+
+    if [ "$depth" -gt "$max_depth" ]; then
+        return
+    fi
+
+    # Call Google Suggest API
+    suggestions=$(curl -s --get --data-urlencode "q=$query" "https://suggestqueries.google.com/complete/search?output=chrome&hl=${language}&gl=${region}" | iconv -f iso8859-1 -t utf-8 )
+
+    # Parse suggestions using jq
+    suggestions=$(echo "$suggestions" | jq -r '.[1][]' 2>/dev/null)
+
+    # Recursive call for each suggestion if not already seen
+    if [ -n "$suggestions" ]; then
+      while read -r suggestion; do
+          if [ -z "${seen["$suggestion"]}" ]; then
+            echo "$suggestion"
+            seen["$suggestion"]=1
+
+            get_suggestions "$suggestion" "$language" "$region" "$max_depth" "$((depth + 1))"
+          fi
+      done <<< "$suggestions"
+    fi
+}
+
+# Check if all four positional parameters are provided
+if [ $# -eq 4 ]; then
+    generate_keywords "$1" "$2" "$3" "$4" 1
+else
+    echo "Usage: $0 <query> <language> <region> <max_depth>"
+    exit 1
+fi
