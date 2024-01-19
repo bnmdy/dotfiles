@@ -1,0 +1,7 @@
+#!/bin/bash
+#
+# Prints the sum of all indent for each file in the current directory and
+# subdirectories as a proxy for complexity.
+#
+
+find . -type f -exec awk -v OFS=',' '{ match($0, /^[\t ]+/); s += (RLENGTH >= 0 ? RLENGTH : 0); } END { print FILENAME, s; }' {} \;
